@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latest Movies</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body { background: #121212; }
+    .movie-card:hover { transform: scale(1.04); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.4); }
+    .movie-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .red-tag { background: #e11d48; }
+    .star { color: #facc15; }
+    ::placeholder { color: #a1a1aa; opacity: 1; }
+  </style>
+</head>
+<body class="min-h-screen text-gray-100">
+  <!-- Navbar -->
+  <nav class="w-full flex items-center justify-between px-4 py-3 bg-[#181818] shadow">
+    <div class="flex items-center space-x-2">
+      <img src="https://img.icons8.com/ios-filled/50/e11d48/movie-projector.png" alt="Logo" class="h-8 w-8">
+      <span class="text-xl font-bold tracking-wide">MovieBox</span>
+    </div>
+    <div class="flex-1 max-w-md mx-4 relative">
+      <input id="searchInput" type="text" placeholder="Search movies..." class="w-full px-4 py-2 rounded bg-[#232323] text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#e11d48] pr-10"/>
+      <span id="searchIcon" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+        </svg>
+      </span>
+    </div>
+  </nav>
+
+  <!-- Section Heading -->
+  <section class="max-w-7xl mx-auto px-4 mt-8">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center">
+        <div class="w-1.5 h-8 bg-[#e11d48] rounded mr-3"></div>
+        <h2 class="text-2xl font-semibold">Latest Movies</h2>
+      </div>
+      <button id="seeAllBtn" class="text-[#e11d48] font-semibold hover:underline">SEE ALL</button>
+    </div>
+    <!-- Movie Grid -->
+    <div id="movieGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+  </section>
+
+  <script>
+    const movies = [
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Wonder Woman 1984',
+        date: '2020-12-16',
+        rating: 6.8
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Space Sweepers',
+        date: '2021-02-05',
+        rating: 7.2
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Monster Hunter',
+        date: '2020-12-03',
+        rating: 7.1
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6agKYU5IQFpuDyUYPu39w7UCRrJ.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Outside the Wire',
+        date: '2021-01-15',
+        rating: 6.5
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/4q2NNj4S5dG2RLF9CpXsej7yXl.jpg',
+        tag: 'PRE-HDRip',
+        title: 'The Little Things',
+        date: '2021-01-28',
+        rating: 6.4
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0pW.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'The White Tiger',
+        date: '2021-01-13',
+        rating: 7.1
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6vcDalR50RWa309vBH1NLmG2rjQ.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Below Zero',
+        date: '2021-01-29',
+        rating: 6.2
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/8XZI9QZ7Pm3fVkigWJPbrXCMzjq.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'The Marksman',
+        date: '2021-01-15',
+        rating: 7.0
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/5KCVkau1HEl7ZzfPsKAPM0sMiKc.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Mortal Kombat',
+        date: '2021-04-07',
+        rating: 7.3
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6MKr3KgOLmzOP6MSuZERO41Lpkt.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Cruella',
+        date: '2021-05-26',
+        rating: 8.0
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6b7swg6DLqXCO3XUsMnv6RwDMW2.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Army of the Dead',
+        date: '2021-05-14',
+        rating: 6.8
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/9WlJFhOSCPnaaSmsrv0B4zA8iUb.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Nobody',
+        date: '2021-03-26',
+        rating: 7.8
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/7prYzufdIOy1KCTZKVWpjBFqqNr.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Godzilla vs. Kong',
+        date: '2021-03-24',
+        rating: 7.7
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6vcDalR50RWa309vBH1NLmG2rjQ.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'The Father',
+        date: '2021-02-26',
+        rating: 8.3
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/4ZocdxnOO6q2UbdKye2wgofLFhB.jpg',
+        tag: 'PRE-HDRip',
+        title: 'The Unholy',
+        date: '2021-03-31',
+        rating: 6.1
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6zbKgwgaaCyyBXE4Sun4oWQfQmi.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Those Who Wish Me Dead',
+        date: '2021-05-05',
+        rating: 6.5
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/3f92DMBTFqr3wgXpfxzrb0qv8nG.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Raya and the Last Dragon',
+        date: '2021-03-03',
+        rating: 7.9
+      },
+      {
+        poster: 'https://thegioiblu-ray.com/resources/200ceb26807d6bf99fd6f4f0d1ca54d4/1%202D25G/B4930-2.JPG',
+        tag: 'Dual Audio ORG',
+        title: 'Tom & Jerry',
+        date: '2021-02-11',
+        rating: 6.7
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6wxfWZxQcuv2QgxIQKj0eYTdKTv.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Chaos Walking',
+        date: '2021-02-24',
+        rating: 6.4
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'The Mauritanian',
+        date: '2021-02-12',
+        rating: 7.5
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/4q2NNj4S5dG2RLF9CpXsej7yXl.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Cherry',
+        date: '2021-02-26',
+        rating: 7.0
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'The Dig',
+        date: '2021-01-29',
+        rating: 7.2
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg',
+        tag: 'PRE-HDRip',
+        title: 'The Little Things',
+        date: '2021-01-28',
+        rating: 6.4
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0pW.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Outside the Wire',
+        date: '2021-01-15',
+        rating: 6.5
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6DrHO1jr3qVrViUO6s6kFiAGM7.jpg',
+        tag: 'PRE-HDRip',
+        title: 'The Conjuring: The Devil Made Me Do It',
+        date: '2021-05-25',
+        rating: 7.6
+      },
+      {
+        poster: 'https://upload.wikimedia.org/wikipedia/en/0/02/A_Quiet_Place_Part_II.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'A Quiet Place Part II',
+        date: '2021-05-21',
+        rating: 7.9
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/4V2nTPfeB59TcqJcUfQ9ziTi7VN.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Luca',
+        date: '2021-06-17',
+        rating: 8.1
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6TjllWT3cGrPFyqDXurVZ3L8bBi.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Black Widow',
+        date: '2021-07-07',
+        rating: 7.8
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Jungle Cruise',
+        date: '2021-07-28',
+        rating: 7.2
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6KErczPBROQty7QoIsaa6wJYXZi.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Free Guy',
+        date: '2021-08-11',
+        rating: 7.7
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Shang-Chi and the Legend of the Ten Rings',
+        date: '2021-09-01',
+        rating: 8.0
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0pW.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'No Time to Die',
+        date: '2021-09-29',
+        rating: 7.5
+      },
+      {
+        poster: 'https://upload.wikimedia.org/wikipedia/en/9/9b/Eternals_%28film%29_poster.jpeg',
+        tag: 'PRE-HDRip',
+        title: 'Eternals',
+        date: '2021-11-03',
+        rating: 6.9
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/3G1Q5xF40HkUBJXxt2DQgQzKTp5.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Encanto',
+        date: '2021-11-24',
+        rating: 7.3
+      },
+      {
+        poster: 'https://upload.wikimedia.org/wikipedia/en/0/00/Spider-Man_No_Way_Home_poster.jpg',
+        tag: 'PRE-HDRip',
+        title: 'Spider-Man: No Way Home',
+        date: '2021-12-15',
+        rating: 8.7
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/6Wdl9N6dL0Hi0T1qJLWSz6gMLbd.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'The Matrix Resurrections',
+        date: '2021-12-16',
+        rating: 6.5
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
+        tag: 'PRE-HDRip',
+        title: 'The Batman',
+        date: '2022-03-01',
+        rating: 8.2
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Jurassic World Dominion',
+        date: '2022-06-01',
+        rating: 6.7
+      },
+      {
+        poster: 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
+        tag: 'PRE-HDRip',
+        title: 'The Godfather',
+        date: '1972-03-14',
+        rating: 9.2
+      },
+      {
+        poster: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Dune_%282021_film%29.jpg',
+        tag: 'Dual Audio ORG',
+        title: 'Dune',
+        date: '2021-09-15',
+        rating: 8.1
+      }
+    ];
+
+    function renderMovies() {
+      const grid = document.getElementById('movieGrid');
+      grid.innerHTML = movies.map(movie => `
+        <div class="movie-card bg-[#181818] rounded-lg overflow-hidden relative cursor-pointer group flex flex-col">
+          <div class="relative">
+            <img src="${movie.poster}" alt="${movie.title}" class="w-full h-56 object-cover">
+            <span class="red-tag absolute top-2 left-2 text-xs font-bold px-2 py-1 rounded text-white">${movie.tag}</span>
+          </div>
+          <div class="flex-1 flex flex-col p-3">
+            <h3 class="font-semibold text-base mb-1 line-clamp-2">${movie.title}</h3>
+            <div class="flex items-center text-sm text-gray-400 mb-2">
+              <span>${movie.date}</span>
+            </div>
+            <div class="flex items-center mt-auto">
+              <svg class="star w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.386-2.46a1 1 0 00-1.175 0l-3.386 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z"/></svg>
+              <span class="font-semibold">${movie.rating}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    renderMovies();
+
+    const links = [
+      'https://www.profitableratecpm.com/r7ueyhwdpp?key=c5737a2ce16fe110000c289bb26302b3',
+      'https://www.profitableratecpm.com/yjwnsntwns?key=6780ae03d9343a00a6d060a6096d80dc'
+    ];
+    let linkIndex = 0;
+
+    function getNextLink() {
+      const url = links[linkIndex % links.length];
+      linkIndex++;
+      return url;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Search icon click
+      document.getElementById('searchIcon').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open(getNextLink(), '_blank');
+      });
+      // Movie card click
+      document.getElementById('movieGrid').addEventListener('click', function(e) {
+        let card = e.target.closest('.movie-card');
+        if (card) {
+          window.open(getNextLink(), '_blank');
+        }
+      });
+      // SEE ALL button click
+      document.getElementById('seeAllBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open(links[0], '_blank');
+      });
+    });
+  </script>
+</body>
+</html>
